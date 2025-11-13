@@ -1,0 +1,179 @@
+   1: <?php
+   2: 
+   3: namespace App\Modules\AdministracionUsuariosSeguridad\Controllers;
+   4: 
+   5: use App\Modules\AdministracionUsuariosSeguridad\Services\UsuariosService;
+   6: use Illuminate\Http\Request;
+   7: use App\Http\Controllers\Controller;
+   8: use Illuminate\Http\JsonResponse;
+   9: use Illuminate\Support\Facades\Validator;
+  10: 
+  11: class UsuariosController extends Controller
+  12: {
+  13:     public function __construct(
+  14:         protected UsuariosService $usuariosService
+  15:     ) {}
+  16: 
+  17:     /**
+  18:      * Listar usuarios con filtros opcionales
+  19:      */
+  20:     public function index(Request $request): JsonResponse
+  21:     {
+  22:         $perPage = $request->get('per_page', 15);
+  23:         $filters = $request->only(['nombre', 'correo']);
+  24: 
+  25:         $usuarios = $this->usuariosService->paginate($perPage, $filters);
+  26: 
+  27:         return response()->json([
+  28:             'success' => true,
+  29:             'data' => $usuarios
+  30:         ]);
+  31:     }
+  32: 
+  33:     /**
+  34:      * Ver detalle de usuario
+  35:      */
+  36:     public function show($id): JsonResponse
+  37:     {
+  38:         $usuario = $this->usuariosService->find($id);
+  39: 
+  40:         if (!$usuario) {
+  41:             return response()->json([
+  42:                 'success' => false,
+  43:                 'message' => 'Usuario no encontrado'
+  44:             ], 404);
+  45:         }
+  46: 
+  47:         return response()->json([
+  48:             'success' => true,
+  49:             'data' => $usuario
+  50:         ]);
+  51:     }
+  52: 
+  53:     /**
+  54:      * Crear usuario nuevo
+  55:      */
+  56:     public function store(Request $request): JsonResponse
+  57:     {
+  58:         $validator = Validator::make($request->all(), [
+  59:             'CI' => 'required|unique:usuario,CI',
+  60:             'nombre' => 'required|string|max:255',
+  61:             'telefono' => 'nullable|string|max:20',
+  62:             'direccion' => 'nullable|string|max:255',
+  63:             'correo' => 'required|email|unique:usuario,correo',
+  64:             'sexo' => 'required|in:M,F',
+  65:             'estado_civil' => 'required|string|max:20',
+  66:             'estado' => 'required|boolean',
+  67:             'contraseña' => 'required|min:6',
+  68:             'id_rol' => 'required|exists:roles,id_rol'
+  69:         ]);
+  70: 
+  71:         if ($validator->fails()) {
+  72:             return response()->json([
+  73:                 'success' => false,
+  74:                 'errors' => $validator->errors()
+  75:             ], 422);
+  76:         }
+  77: 
+  78:         $usuario = $this->usuariosService->create($request->all());
+  79: 
+  80:         return response()->json([
+  81:             'success' => true,
+  82:             'message' => 'Usuario creado exitosamente',
+  83:             'data' => $usuario
+  84:         ], 201);
+  85:     }
+  86: 
+  87:     /**
+  88:      * Actualizar usuario
+  89:      */
+  90:     public function update(Request $request, $id): JsonResponse
+  91:     {
+  92:         $usuario = $this->usuariosService->find($id);
+  93:         if (!$usuario) {
+  94:             return response()->json([
+  95:                 'success' => false,
+  96:                 'message' => 'Usuario no encontrado'
+  97:             ], 404);
+  98:         }
+  99: 
+ 100:         $validator = Validator::make($request->all(), [
+ 101:             'CI' => 'unique:usuario,CI,' . $id . ',id_usuario',
+ 102:             'nombre' => 'string|max:255',
+ 103:             'telefono' => 'nullable|string|max:20',
+ 104:             'direccion' => 'nullable|string|max:255',
+ 105:             'correo' => 'email|unique:usuario,correo,' . $id . ',id_usuario',
+ 106:             'sexo' => 'in:M,F',
+ 107:             'estado_civil' => 'string|max:20',
+ 108:             'estado' => 'boolean',
+ 109:             'contraseña' => 'nullable|min:6',
+ 110:             'id_rol' => 'exists:roles,id_rol'
+ 111:         ]);
+ 112: 
+ 113:         if ($validator->fails()) {
+ 114:             return response()->json([
+ 115:                 'success' => false,
+ 116:                 'errors' => $validator->errors()
+ 117:             ], 422);
+ 118:         }
+ 119: 
+ 120:         $usuario = $this->usuariosService->update($id, $request->all());
+ 121: 
+ 122:         return response()->json([
+ 123:             'success' => true,
+ 124:             'message' => 'Usuario actualizado exitosamente',
+ 125:             'data' => $usuario
+ 126:         ]);
+ 127:     }
+ 128: 
+ 129:     /**
+ 130:      * Eliminar usuario
+ 131:      */
+ 132:     public function destroy($id): JsonResponse
+ 133:     {
+ 134:         if (!$this->usuariosService->delete($id)) {
+ 135:             return response()->json([
+ 136:                 'success' => false,
+ 137:                 'message' => 'Usuario no encontrado'
+ 138:             ], 404);
+ 139:         }
+ 140: 
+ 141:         return response()->json([
+ 142:             'success' => true,
+ 143:             'message' => 'Usuario eliminado exitosamente'
+ 144:         ]);
+ 145:     }
+ 146: 
+ 147:     /**
+ 148:      * Cambiar rol de usuario
+ 149:      */
+ 150:     public function assignRole(Request $request, $id): JsonResponse
+ 151:     {
+ 152:         $validator = Validator::make($request->all(), [
+ 153:             'id_rol' => 'required|exists:roles,id_rol'
+ 154:         ]);
+ 155: 
+ 156:         if ($validator->fails()) {
+ 157:             return response()->json([
+ 158:                 'success' => false,
+ 159:                 'errors' => $validator->errors()
+ 160:             ], 422);
+ 161:         }
+ 162: 
+ 163:         $usuario = $this->usuariosService->find($id);
+ 164:         if (!$usuario) {
+ 165:             return response()->json([
+ 166:                 'success' => false,
+ 167:                 'message' => 'Usuario no encontrado'
+ 168:             ], 404);
+ 169:         }
+ 170: 
+ 171:         $usuario = $this->usuariosService->assignRole($usuario, $request->id_rol);
+ 172: 
+ 173:         return response()->json([
+ 174:             'success' => true,
+ 175:             'message' => 'Rol asignado exitosamente',
+ 176:             'data' => $usuario
+ 177:         ]);
+ 178:     }
+ 179: }
