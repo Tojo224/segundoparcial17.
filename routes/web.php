@@ -8,6 +8,7 @@ use App\Modules\GestionAcademica\Controllers\DocentesController;
 use App\Modules\GestionAcademica\Controllers\MateriasController;
 use App\Modules\GestionAcademica\Controllers\GruposController;
 use App\Modules\GestionAcademica\Controllers\CargaHorariaController;
+use App\Modules\AulasHorarios\Controllers\HorariosController;
 
 Route::get('/', function () { return redirect('/login'); });
 
@@ -58,6 +59,13 @@ Route::middleware('auth')->group(function () {
     Route::post('/asignar-grupos', [CargaHorariaController::class, 'asignarGrupoWeb'])->name('carga-horaria.asignar.store');
     Route::delete('/asignar-grupos/{id}', [CargaHorariaController::class, 'eliminarAsignacionWeb'])->name('carga-horaria.eliminar');
     Route::get('/asignaciones-grupos', [CargaHorariaController::class, 'vistaAsignaciones'])->name('carga-horaria.vista');
+
+    // CU11 - Gestionar Horarios
+    Route::get('/horarios', [HorariosController::class, 'vistaCalendario'])->name('horarios.calendario');
+    Route::post('/horarios', [HorariosController::class, 'storeWeb'])->name('horarios.store');
+    Route::put('/horarios/{id}', [HorariosController::class, 'updateWeb'])->name('horarios.update');
+    Route::delete('/horarios/{id}', [HorariosController::class, 'destroyWeb'])->name('horarios.destroy');
+    Route::post('/horarios/verificar-conflictos', [HorariosController::class, 'verificarConflictosAPI'])->name('horarios.verificar-conflictos');
 });
 
 // Cargar rutas API (roles, usuarios, bitácora)
