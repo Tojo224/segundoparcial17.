@@ -213,8 +213,8 @@
               </a>
             </li>
 
-            <li><a href="#" data-role="CU9" class="flex items-center gap-2 px-4 py-2 rounded-md hover:bg-white/5"><svg class="h-5 w-5 opacity-80" viewBox="0 0 24 24" fill="currentColor"><path d="M4 6.75A1.75 1.75 0 0 1 5.75 5h12.5A1.75 1.75 0 0 1 20 6.75v10.5A1.75 1.75 0 0 1 18.25 19H5.75A1.75 1.75 0 0 1 4 17.25V6.75Zm3 2.5h10v6.5H7v-6.5Z"/></svg>Gestionar carga horaria</a></li>
-            <li><a href="#" data-role="CU10" class="flex items-center gap-2 px-4 py-2 rounded-md hover:bg-white/5"><svg class="h-5 w-5 opacity-80" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>Asignar grupos a docentes</a></li>
+            <li><a href="{{ route('carga-horaria.vista') }}" data-role="CU9" class="flex items-center gap-2 px-4 py-2 rounded-md hover:bg-white/5"><svg class="h-5 w-5 opacity-80" viewBox="0 0 24 24" fill="currentColor"><path d="M4 6.75A1.75 1.75 0 0 1 5.75 5h12.5A1.75 1.75 0 0 1 20 6.75v10.5A1.75 1.75 0 0 1 18.25 19H5.75A1.75 1.75 0 0 1 4 17.25V6.75Zm3 2.5h10v6.5H7v-6.5Z"/></svg>Gestionar carga horaria</a></li>
+            <li><a href="{{ route('carga-horaria.asignar') }}" data-role="CU10" class="flex items-center gap-2 px-4 py-2 rounded-md hover:bg-white/5"><svg class="h-5 w-5 opacity-80" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>Asignar grupos a docentes</a></li>
           </ul>
         </div>
       </section>
@@ -235,10 +235,10 @@
             <svg :class="{'rotate-180': open}" class="h-4 w-4 text-slate-300 transition" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m19 9-7 7-7-7"/></svg>
           </button>
           <ul x-show="open" x-collapse class="py-1">
-            <li><a href="#" data-role="CU11" class="flex items-center gap-2 px-4 py-2 rounded-md hover:bg-white/5"><svg class="h-5 w-5 opacity-80" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3M5 21h14a2 2 0 0 0 2-2v-9H3v9a2 2 0 0 0 2 2Z"/></svg>Asignar horarios manualmente</a></li>
-            <li><a href="#" data-role="CU12_Horarios" class="flex items-center gap-2 px-4 py-2 rounded-md hover:bg-white/5"><svg class="h-5 w-5 opacity-80" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 1 0 10 10A10.011 10.011 0 0 0 12 2Zm.75 5.25a.75.75 0 0 0-1.5 0V12a.75.75 0 0 0 .22.53l3 3a.75.75 0 1 0 1.06-1.06l-2.78-2.78Z"/></svg>Gestionar horarios</a></li>
-            <li><a href="#" data-role="CU12_Aulas" class="flex items-center gap-2 px-4 py-2 rounded-md hover:bg-white/5"><svg class="h-5 w-5 opacity-80" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7l9-4 9 4-9 4-9-4z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 17l9 4 9-4"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l9 4 9-4"/></svg>Gestionar aulas</a></li>
-            <li><a href="#" data-role="CU13" class="flex items-center gap-2 px-4 py-2 rounded-md hover:bg-white/5"><svg class="h-5 w-5 opacity-80" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3M5 21h14M3 11h18"/></svg>Gestionar reserva de aula</a></li>
+            <li><a href="{{ route('horarios.calendario') }}" data-role="CU11" class="flex items-center gap-2 px-4 py-2 rounded-md hover:bg-white/5"><svg class="h-5 w-5 opacity-80" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3M5 21h14a2 2 0 0 0 2-2v-9H3v9a2 2 0 0 0 2 2Z"/></svg>Asignar horarios manualmente</a></li>
+            <li><a href="{{ route('horarios.calendario') }}" data-role="CU12_Horarios" class="flex items-center gap-2 px-4 py-2 rounded-md hover:bg-white/5"><svg class="h-5 w-5 opacity-80" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 1 0 10 10A10.011 10.011 0 0 0 12 2Zm.75 5.25a.75.75 0 0 0-1.5 0V12a.75.75 0 0 0 .22.53l3 3a.75.75 0 1 0 1.06-1.06l-2.78-2.78Z"/></svg>Gestionar horarios</a></li>
+            <li><a href="{{ route('aulas.vista') }}" data-role="CU12_Aulas" class="flex items-center gap-2 px-4 py-2 rounded-md hover:bg-white/5"><svg class="h-5 w-5 opacity-80" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7l9-4 9 4-9 4-9-4z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 17l9 4 9-4"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l9 4 9-4"/></svg>Gestionar aulas</a></li>
+            <li><a href="{{ route('reservas.vista') }}" data-role="CU13" class="flex items-center gap-2 px-4 py-2 rounded-md hover:bg-white/5"><svg class="h-5 w-5 opacity-80" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3M5 21h14M3 11h18"/></svg>Gestionar reserva de aula</a></li>
           </ul>
         </div>
       </section>
@@ -259,8 +259,8 @@
             <svg :class="{'rotate-180': open}" class="h-4 w-4 text-slate-300 transition" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m19 9-7 7-7-7"/></svg>
           </button>
           <ul x-show="open" x-collapse class="py-1">
-            <li><a href="#" data-role="CU14" class="flex items-center gap-2 px-4 py-2 rounded-md hover:bg-white/5"><svg class="h-5 w-5 opacity-80" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>Registrar asistencia docente</a></li>
-            <li><a href="#" data-role="CU15" class="flex items-center gap-2 px-4 py-2 rounded-md hover:bg-white/5"><svg class="h-5 w-5 opacity-80" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6h6m-6 6h6m-6 6h6M8 6h.01M8 12h.01M8 18h.01"/></svg>Consultar asistencia</a></li>
+            <li><a href="{{ route('asistencia.vista') }}" data-role="CU14" class="flex items-center gap-2 px-4 py-2 rounded-md hover:bg-white/5"><svg class="h-5 w-5 opacity-80" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>Registrar asistencia docente</a></li>
+            <li><a href="{{ route('asistencia.vista') }}" data-role="CU15" class="flex items-center gap-2 px-4 py-2 rounded-md hover:bg-white/5"><svg class="h-5 w-5 opacity-80" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6h6m-6 6h6m-6 6h6M8 6h.01M8 12h.01M8 18h.01"/></svg>Consultar asistencia</a></li>
           </ul>
         </div>
       </section>
@@ -345,9 +345,9 @@
 <!-- Lógica de permisos por rol -->
 <script>
   const permisos = {
-    Administrador: ['CU1','CU2','CU3','CU4','CU5','CU6','CU7','CU8','CU9','CU12_Aulas','CU13'],
-    Coordinador:   ['CU1','CU2','CU3','CU6','CU7','CU8','CU9','CU10','CU11','CU12_Horarios','CU13','CU15','CU16','CU17','CU18'],
-    Docente:       ['CU1','CU2','CU3','CU14'],
+    Administrador: ['CU1','CU2','CU3','CU4','CU5','CU6','CU7','CU8','CU9','CU10','CU11','CU12_Aulas','CU12_Horarios','CU13','CU14','CU15'],
+    Coordinador:   ['CU1','CU2','CU3','CU6','CU7','CU8','CU9','CU10','CU11','CU12_Horarios','CU13','CU14','CU15','CU16','CU17','CU18'],
+    Docente:       ['CU1','CU2','CU3','CU14','CU15'],
     Autoridad:     ['CU1','CU2','CU3','CU15','CU16','CU17','CU18'],
     Auxiliar:      ['CU1','CU2','CU3','CU12_Aulas','CU13']
   };
