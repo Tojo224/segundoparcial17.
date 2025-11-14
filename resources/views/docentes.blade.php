@@ -27,8 +27,23 @@
 
     <nav class="p-4 space-y-2">
       <a href="{{ route('home') }}" class="block px-3 py-2 rounded-md hover:bg-slate-800">Dashboard</a>
-      <a href="{{ route('usuarios.vista') }}" class="block px-3 py-2 rounded-md hover:bg-slate-800">Gestionar Usuarios</a>
+      
+      <!-- Gestión Académica -->
+      <div class="pt-2 pb-1">
+        <p class="px-3 text-xs font-semibold text-slate-400 uppercase">Académico</p>
+      </div>
       <a href="{{ route('docentes.vista') }}" class="block px-3 py-2 rounded-md bg-blue-700">Gestionar Docentes</a>
+      <a href="{{ route('materias.vista') }}" class="block px-3 py-2 rounded-md hover:bg-slate-800">Gestionar Materias</a>
+      <a href="{{ route('grupos.vista') }}" class="block px-3 py-2 rounded-md hover:bg-slate-800">Gestionar Grupos</a>
+      <a href="{{ route('carga-horaria.asignar') }}" class="block px-3 py-2 rounded-md hover:bg-slate-800">Asignar Grupos</a>
+      <a href="{{ route('carga-horaria.vista') }}" class="block px-3 py-2 rounded-md hover:bg-slate-800">Ver Asignaciones</a>
+      
+      <!-- Administración -->
+      <div class="pt-2 pb-1">
+        <p class="px-3 text-xs font-semibold text-slate-400 uppercase">Administración</p>
+      </div>
+      <a href="{{ route('usuarios.vista') }}" class="block px-3 py-2 rounded-md hover:bg-slate-800">Gestionar Usuarios</a>
+      <a href="{{ route('bitacora.vista') }}" class="block px-3 py-2 rounded-md hover:bg-slate-800">Bitácora</a>
 
       <!-- Cerrar sesión -->
       <form method="POST" action="{{ route('logout') }}" class="mt-4">

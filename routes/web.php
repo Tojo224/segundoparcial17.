@@ -7,6 +7,7 @@ use App\Modules\AdministracionUsuariosSeguridad\Controllers\BitacoraController;
 use App\Modules\GestionAcademica\Controllers\DocentesController;
 use App\Modules\GestionAcademica\Controllers\MateriasController;
 use App\Modules\GestionAcademica\Controllers\GruposController;
+use App\Modules\GestionAcademica\Controllers\CargaHorariaController;
 
 Route::get('/', function () { return redirect('/login'); });
 
@@ -51,6 +52,12 @@ Route::middleware('auth')->group(function () {
     Route::post('/grupos', [GruposController::class, 'storeWeb'])->name('grupos.store');
     Route::put('/grupos/{id}', [GruposController::class, 'updateWeb'])->name('grupos.update'); 
     Route::delete('/grupos/{id}', [GruposController::class, 'destroyWeb'])->name('grupos.destroy');
+
+    // CU10 - Asignar Grupos a Docentes (Carga Horaria)
+    Route::get('/asignar-grupos', [CargaHorariaController::class, 'vistaAsignarGrupos'])->name('carga-horaria.asignar');
+    Route::post('/asignar-grupos', [CargaHorariaController::class, 'asignarGrupoWeb'])->name('carga-horaria.asignar.store');
+    Route::delete('/asignar-grupos/{id}', [CargaHorariaController::class, 'eliminarAsignacionWeb'])->name('carga-horaria.eliminar');
+    Route::get('/asignaciones-grupos', [CargaHorariaController::class, 'vistaAsignaciones'])->name('carga-horaria.vista');
 });
 
 // Cargar rutas API (roles, usuarios, bitácora)

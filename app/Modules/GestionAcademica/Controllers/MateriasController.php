@@ -3,19 +3,19 @@
 namespace App\Modules\GestionAcademica\Controllers;
 
 use App\Http\Controllers\Controller;
-use App\Modules\GestionAcademica\Services\GruposService;
+use App\Modules\GestionAcademica\Services\MateriasService;
 use App\Modules\AdministracionUsuariosSeguridad\Services\BitacoraService;
-use App\Modules\GestionAcademica\Models\Materia;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Auth;
 
-class GruposController extends Controller
+class MateriasController extends Controller
 {
-    protected GruposService $service;
+    protected MateriasService $service;
     protected BitacoraService $bitacora;
 
-    public function __construct(GruposService $service, BitacoraService $bitacora)
+    public function __construct(MateriasService $service, BitacoraService $bitacora)
     {
         $this->service = $service;
         $this->bitacora = $bitacora;
@@ -24,157 +24,187 @@ class GruposController extends Controller
     // === API ===
     public function index(Request $request): JsonResponse
     {
-        $filters = $request->only(['codigo','estado','id_materia']);
+        $filters = $request->only(['sigla', 'nombre']);
         $items = $this->service->paginate($request->integer('per_page', 15), $filters);
-        return response()->json(['success'=>true,'data'=>$items]);
+        return response()->json(['success' => true, 'data' => $items]);
     }
 
     public function show($id): JsonResponse
     {
         $item = $this->service->find($id);
-        if (!$item) return response()->json(['success'=>false,'message'=>'Grupo no encontrado'],404);
-        return response()->json(['success'=>true,'data'=>$item]);
+        if (!$item) return response()->json(['success' => false, 'message' => 'Materia no encontrada'], 404);
+        return response()->json(['success' => true, 'data' => $item]);
     }
 
     public function store(Request $request): JsonResponse
     {
         $v = Validator::make($request->all(), [
-            'codigo' => 'required|string|max:10|unique:grupo,codigo',
-            'estado' => 'boolean',
-            'id_materia' => 'required|exists:materia,id_materia',
+            'sigla' => 'required|string|max:10|unique:materia,sigla',
+            'nombre' => 'required|string|max:255',
         ]);
-        if ($v->fails()) return response()->json(['success'=>false,'errors'=>$v->errors()],422);
+        if ($v->fails()) return response()->json(['success' => false, 'errors' => $v->errors()], 422);
 
         $item = $this->service->create($v->validated());
 
-        // 🔹 Bitácora
-        $usuario = auth()->user();
+        // Bitácora
+        $usuario = Auth::user();
         if ($usuario) {
             $this->bitacora->registrar(
-                "{$usuario->nombre} creó el grupo {$item->codigo} ({$item->materia->nombre})",
+                "{$usuario->nombre} creó la materia {$item->nombre} ({$item->sigla})",
                 $usuario->id_usuario
             );
         }
 
-        return response()->json(['success'=>true,'message'=>'Grupo creado','data'=>$item],201);
+        return response()->json(['success' => true, 'message' => 'Materia creada', 'data' => $item], 201);
     }
 
     public function update(Request $request, $id): JsonResponse
     {
         $exists = $this->service->find($id);
-        if (!$exists) return response()->json(['success'=>false,'message'=>'Grupo no encontrado'],404);
+        if (!$exists) return response()->json(['success' => false, 'message' => 'Materia no encontrada'], 404);
 
         $v = Validator::make($request->all(), [
-            'codigo' => 'string|max:10|unique:grupo,codigo,'.$id.',id_grupo',
-            'estado' => 'boolean',
-            'id_materia' => 'exists:materia,id_materia',
+            'sigla' => 'string|max:10|unique:materia,sigla,' . $id . ',id_materia',
+            'nombre' => 'string|max:255',
         ]);
-        if ($v->fails()) return response()->json(['success'=>false,'errors'=>$v->errors()],422);
+        if ($v->fails()) return response()->json(['success' => false, 'errors' => $v->errors()], 422);
 
         $item = $this->service->update($id, $v->validated());
 
-        // 🔹 Bitácora
-        $usuario = auth()->user();
+        // Bitácora
+        $usuario = Auth::user();
         if ($usuario) {
             $this->bitacora->registrar(
-                "{$usuario->nombre} actualizó el grupo {$item->codigo} ({$item->materia->nombre})",
+                "{$usuario->nombre} actualizó la materia {$item->nombre} ({$item->sigla})",
                 $usuario->id_usuario
             );
         }
 
-        return response()->json(['success'=>true,'message'=>'Grupo actualizado','data'=>$item]);
+        return response()->json(['success' => true, 'message' => 'Materia actualizada', 'data' => $item]);
     }
 
-    // === Eliminado lógico ===
     public function destroy($id): JsonResponse
     {
-        $grupo = $this->service->find($id);
-        if (!$grupo) return response()->json(['success'=>false,'message'=>'Grupo no encontrado'],404);
+        $materia = $this->service->find($id);
+        if (!$materia) return response()->json(['success' => false, 'message' => 'Materia no encontrada'], 404);
 
-        // Eliminado lógico: cambiar estado a inactivo
-        $grupo->estado = false;
-        $grupo->save();
+        $this->service->delete($id);
 
-        // 🔹 Bitácora
-        $usuario = auth()->user();
+        // Bitácora
+        $usuario = Auth::user();
         if ($usuario) {
             $this->bitacora->registrar(
-                "{$usuario->nombre} desactivó el grupo {$grupo->codigo} ({$grupo->materia->nombre})",
+                "{$usuario->nombre} eliminó la materia {$materia->nombre} ({$materia->sigla})",
                 $usuario->id_usuario
             );
         }
 
-        return response()->json(['success'=>true,'message'=>'Grupo desactivado']);
+        return response()->json(['success' => true, 'message' => 'Materia eliminada']);
     }
 
     // === WEB ===
-    public function vistaGrupos(Request $request)
+    public function vistaMaterias(Request $request)
     {
         $buscar = $request->get('buscar');
         $filters = [];
 
         if ($buscar) {
-            $filters['codigo'] = $buscar;
+            $filters['nombre'] = $buscar;
+            $filters['sigla'] = $buscar;
         }
 
-        $grupos = $this->service->paginate(10, $filters);
-        $materias = Materia::all();
-        return view('grupos', compact('grupos', 'materias'));
+        $materias = $this->service->paginate(10, $filters);
+        return view('materias', compact('materias'));
     }
 
     public function storeWeb(Request $request)
     {
         $v = Validator::make($request->all(), [
-            'codigo' => 'required|string|max:10|unique:grupo,codigo',
-            'estado' => 'boolean',
-            'id_materia' => 'required|exists:materia,id_materia',
+            'sigla' => 'required|string|max:10|unique:materia,sigla',
+            'nombre' => 'required|string|max:255',
         ]);
 
         if ($v->fails()) {
             return back()->withErrors($v)->withInput();
         }
 
-        $data = $v->validated();
-        $data['estado'] = $request->has('estado');
-
-        $grupo = $this->service->create($data);
-
-        // 🔹 Bitácora
-        $usuario = auth()->user();
-        if ($usuario) {
-            $this->bitacora->registrar(
-                "{$usuario->nombre} registró el grupo {$grupo->codigo} ({$grupo->materia->nombre})",
-                $usuario->id_usuario
-            );
-        }
-
-        return redirect()->route('grupos.vista')->with('success', 'Grupo registrado correctamente.');
-    }
-
-    public function destroyWeb($id)
-    {
-        $grupo = $this->service->find($id);
-        if (!$grupo) {
-            return redirect()->route('grupos.vista')->with('error', 'Grupo no encontrado.');
-        }
-
         try {
-            // Eliminado lógico
-            $grupo->estado = false;
-            $grupo->save();
+            $materia = $this->service->create($v->validated());
 
-            // 🔹 Bitácora
-            $usuario = auth()->user();
+            // Bitácora
+            $usuario = Auth::user();
             if ($usuario) {
                 $this->bitacora->registrar(
-                    "{$usuario->nombre} desactivó el grupo {$grupo->codigo} ({$grupo->materia->nombre})",
+                    "{$usuario->nombre} registró la materia {$materia->nombre} ({$materia->sigla})",
                     $usuario->id_usuario
                 );
             }
 
-            return redirect()->route('grupos.vista')->with('success', 'Grupo desactivado correctamente.');
+            return redirect()->route('materias.vista')->with('success', 'Materia registrada correctamente.');
         } catch (\Exception $e) {
-            return redirect()->route('grupos.vista')->with('error', 'Error al desactivar el grupo: ' . $e->getMessage());
+            return back()->withErrors(['error' => 'Error al registrar: ' . $e->getMessage()])->withInput();
+        }
+    }
+
+    public function updateWeb(Request $request, $id)
+    {
+        $exists = $this->service->find($id);
+        if (!$exists) {
+            return redirect()->route('materias.vista')->with('error', 'Materia no encontrada.');
+        }
+
+        $v = Validator::make($request->all(), [
+            'sigla' => 'required|string|max:10|unique:materia,sigla,' . $id . ',id_materia',
+            'nombre' => 'required|string|max:255',
+        ]);
+
+        if ($v->fails()) {
+            return back()->withErrors($v)->withInput();
+        }
+
+        try {
+            $materia = $this->service->update($id, $v->validated());
+
+            // Bitácora
+            $usuario = Auth::user();
+            if ($usuario) {
+                $this->bitacora->registrar(
+                    "{$usuario->nombre} actualizó la materia {$materia->nombre} ({$materia->sigla})",
+                    $usuario->id_usuario
+                );
+            }
+
+            return redirect()->route('materias.vista')->with('success', 'Materia actualizada correctamente.');
+        } catch (\Exception $e) {
+            return back()->withErrors(['error' => 'Error al actualizar: ' . $e->getMessage()])->withInput();
+        }
+    }
+
+    public function destroyWeb($id)
+    {
+        $materia = $this->service->find($id);
+        if (!$materia) {
+            return redirect()->route('materias.vista')->with('error', 'Materia no encontrada.');
+        }
+
+        try {
+            $nombre = $materia->nombre;
+            $sigla = $materia->sigla;
+
+            $this->service->delete($id);
+
+            // Bitácora
+            $usuario = Auth::user();
+            if ($usuario) {
+                $this->bitacora->registrar(
+                    "{$usuario->nombre} eliminó la materia {$nombre} ({$sigla})",
+                    $usuario->id_usuario
+                );
+            }
+
+            return redirect()->route('materias.vista')->with('success', 'Materia eliminada correctamente.');
+        } catch (\Exception $e) {
+            return redirect()->route('materias.vista')->with('error', 'Error al eliminar: ' . $e->getMessage());
         }
     }
 }
