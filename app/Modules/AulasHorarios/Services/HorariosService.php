@@ -164,4 +164,55 @@ class HorariosService
 
         return $calendario;
     }
+
+    /**
+     * Encontrar primer horario disponible para una carga horaria específica
+     * Busca automáticamente un slot libre sin conflictos
+     */
+    public function encontrarHorarioDisponible(int $idCarga, int $duracionHoras = 2): ?array
+    {
+        $dias = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
+        $horasInicio = ['07:00', '09:00', '11:00', '14:00', '16:00', '18:00', '20:00'];
+        
+        // Obtener todas las aulas disponibles
+        $aulas = \App\Modules\AulasHorarios\Models\Aula::all();
+        
+        if ($aulas->isEmpty()) {
+            return null;
+        }
+
+        // Buscar en cada día y hora
+        foreach ($dias as $dia) {
+            foreach ($horasInicio as $horaInicio) {
+                // Calcular hora fin
+                $horaFin = date('H:i', strtotime($horaInicio) + ($duracionHoras * 3600));
+                
+                // Probar con cada aula
+                foreach ($aulas as $aula) {
+                    // Verificar si hay conflictos
+                    $conflictos = $this->verificarConflictos(
+                        $dia,
+                        $horaInicio,
+                        $horaFin,
+                        $aula->id_aula,
+                        $idCarga,
+                        null
+                    );
+                    
+                    // Si no hay conflictos, retornar este horario
+                    if (empty($conflictos)) {
+                        return [
+                            'dia' => $dia,
+                            'hora_i' => $horaInicio,
+                            'hora_f' => $horaFin,
+                            'id_aula' => $aula->id_aula,
+                            'aula' => $aula
+                        ];
+                    }
+                }
+            }
+        }
+        
+        return null; // No se encontró horario disponible
+    }
 }

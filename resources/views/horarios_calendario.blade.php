@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="csrf-token" content="{{ csrf_token() }}">
-  <title>CU11 - Gestionar Horarios</title>
+  <title> Gestionar Horarios</title>
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
 
@@ -43,7 +43,15 @@
       <div class="pt-2 pb-1">
         <p class="px-3 text-xs font-semibold text-slate-400 uppercase">Aulas y Horarios</p>
       </div>
+      <a href="{{ route('aulas.vista') }}" class="block px-3 py-2 rounded-md hover:bg-slate-800">Gestionar Aulas</a>
       <a href="{{ route('horarios.calendario') }}" class="block px-3 py-2 rounded-md bg-blue-700">Gestionar Horarios</a>
+      <a href="{{ route('reservas.vista') }}" class="block px-3 py-2 rounded-md hover:bg-slate-800">Reservas de Aulas</a>
+      
+      <!-- Control de Asistencia -->
+      <div class="pt-2 pb-1">
+        <p class="px-3 text-xs font-semibold text-slate-400 uppercase">Asistencia</p>
+      </div>
+      <a href="{{ route('asistencia.vista') }}" class="block px-3 py-2 rounded-md hover:bg-slate-800">Registrar Asistencia</a>
       
       <!-- Administración -->
       <div class="pt-2 pb-1">
@@ -67,21 +75,30 @@
       </form>
     </nav>
   </aside>
-
+<!--CU11 Y CU12-->
   <!-- MAIN -->
   <main class="flex-1 p-6 space-y-6 overflow-x-auto">
     <header class="flex justify-between items-center">
       <div>
-        <h1 class="text-2xl font-bold text-slate-800">CU11 - Gestionar Horarios</h1>
+        <h1 class="text-2xl font-bold text-slate-800">Gestionar Horarios</h1>
         <p class="text-slate-500">Calendario semanal de clases con gestión de horarios</p>
       </div>
-      <button onclick="openModalNuevo()" 
-         class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition flex items-center gap-2">
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
-        </svg>
-        Nuevo Horario
-      </button>
+      <div class="flex gap-2">
+        <button onclick="openModalAutomatico()" 
+           class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition flex items-center gap-2">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09zM18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 00-2.456 2.456zM16.894 20.567L16.5 21.75l-.394-1.183a2.25 2.25 0 00-1.423-1.423L13.5 18.75l1.183-.394a2.25 2.25 0 001.423-1.423l.394-1.183.394 1.183a2.25 2.25 0 001.423 1.423l1.183.394-1.183.394a2.25 2.25 0 00-1.423 1.423z" />
+          </svg>
+          Horario Automático
+        </button>
+        <button onclick="openModalNuevo()" 
+           class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition flex items-center gap-2">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+          </svg>
+          Nuevo Horario
+        </button>
+      </div>
     </header>
 
     <!-- Mensajes -->
@@ -343,7 +360,91 @@
     </div>
   </div>
 
+  <!-- Modal Horario Automático -->
+  <div id="modalAutomatico" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+    <div class="bg-white rounded-lg shadow-xl w-full max-w-lg">
+      <div class="p-6 border-b border-slate-200">
+        <h3 class="text-xl font-bold text-slate-800 flex items-center gap-2">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6 text-green-600">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09zM18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 00-2.456 2.456zM16.894 20.567L16.5 21.75l-.394-1.183a2.25 2.25 0 00-1.423-1.423L13.5 18.75l1.183-.394a2.25 2.25 0 001.423-1.423l.394-1.183.394 1.183a2.25 2.25 0 001.423 1.423l1.183.394-1.183.394a2.25 2.25 0 00-1.423 1.423z" />
+          </svg>
+          Generar Horario Automático
+        </h3>
+        <p class="text-sm text-slate-600 mt-2">El sistema buscará automáticamente el primer horario disponible sin conflictos</p>
+      </div>
+
+      <div class="p-6">
+        <!-- Resultado del horario encontrado -->
+        <div id="horarioEncontrado" class="hidden mb-4">
+          <div class="bg-green-50 border-l-4 border-green-500 p-4 rounded mb-4">
+            <p class="text-green-800 font-bold mb-2">✓ ¡Horario Disponible Encontrado!</p>
+            <div class="text-sm text-green-700 space-y-1">
+              <p><strong>Día:</strong> <span id="resultDia"></span></p>
+              <p><strong>Horario:</strong> <span id="resultHora"></span></p>
+              <p><strong>Aula:</strong> <span id="resultAula"></span></p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Mensaje de error -->
+        <div id="errorAutomatico" class="hidden mb-4 bg-red-50 border-l-4 border-red-500 p-4 rounded">
+          <p class="text-red-700 font-medium"></p>
+        </div>
+
+        <!-- Formulario -->
+        <form id="formAutomatico">
+          <div class="space-y-4">
+            <!-- Asignación Docente-Grupo -->
+            <div>
+              <label class="block text-sm font-medium text-slate-700 mb-2">Asignación (Docente-Grupo) *</label>
+              <select name="id_carga" id="autoModalCarga" required
+                class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500">
+                <option value="">-- Seleccione --</option>
+                @foreach($cargas as $carga)
+                  <option value="{{ $carga->id_carga }}">
+                    {{ $carga->docente->usuario->nombre ?? 'N/A' }} - 
+                    {{ $carga->grupo->materia->nombre ?? 'N/A' }} 
+                    (Grupo {{ $carga->grupo->codigo ?? 'N/A' }})
+                  </option>
+                @endforeach
+              </select>
+            </div>
+
+            <!-- Duración -->
+            <div>
+              <label class="block text-sm font-medium text-slate-700 mb-2">Duración de la Clase (horas)</label>
+              <select name="duracion_horas" id="autoModalDuracion"
+                class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500">
+                <option value="1">1 hora</option>
+                <option value="2" selected>2 horas</option>
+                <option value="3">3 horas</option>
+                <option value="4">4 horas</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="flex gap-3 mt-6">
+            <button type="button" onclick="closeModalAutomatico()"
+              class="flex-1 px-4 py-2 bg-slate-200 text-slate-700 rounded-lg hover:bg-slate-300 transition">
+              Cancelar
+            </button>
+            <button type="button" onclick="buscarHorarioAutomatico()" id="btnBuscar"
+              class="flex-1 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition">
+              Buscar Horario
+            </button>
+            <button type="button" onclick="guardarHorarioAutomatico()" id="btnGuardarAuto"
+              class="hidden flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">
+              Guardar Horario
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
   <script>
+    let horarioAutomaticoData = null;
+
     // Abrir modal para nuevo horario
     function openModalNuevo() {
       document.getElementById('modalTitulo').textContent = 'Nuevo Horario';
@@ -373,6 +474,132 @@
     // Cerrar modal
     function closeModal() {
       document.getElementById('modalHorario').classList.add('hidden');
+    }
+
+    // Abrir modal automático
+    function openModalAutomatico() {
+      document.getElementById('formAutomatico').reset();
+      document.getElementById('horarioEncontrado').classList.add('hidden');
+      document.getElementById('errorAutomatico').classList.add('hidden');
+      document.getElementById('btnBuscar').classList.remove('hidden');
+      document.getElementById('btnGuardarAuto').classList.add('hidden');
+      horarioAutomaticoData = null;
+      document.getElementById('modalAutomatico').classList.remove('hidden');
+    }
+
+    // Cerrar modal automático
+    function closeModalAutomatico() {
+      document.getElementById('modalAutomatico').classList.add('hidden');
+    }
+
+    // Buscar horario automático
+    async function buscarHorarioAutomatico() {
+      const idCarga = document.getElementById('autoModalCarga').value;
+      const duracion = document.getElementById('autoModalDuracion').value;
+
+      if (!idCarga) {
+        alert('Por favor seleccione una asignación docente-grupo');
+        return;
+      }
+
+      const btnBuscar = document.getElementById('btnBuscar');
+      btnBuscar.disabled = true;
+      btnBuscar.textContent = 'Buscando...';
+
+      try {
+        const response = await fetch('{{ route("horarios.encontrar-disponible") }}', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+          },
+          body: JSON.stringify({
+            id_carga: idCarga,
+            duracion_horas: parseInt(duracion)
+          })
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+          // Guardar datos del horario encontrado
+          horarioAutomaticoData = data.horario;
+          
+          // Mostrar resultado
+          document.getElementById('resultDia').textContent = data.horario.dia;
+          document.getElementById('resultHora').textContent = `${data.horario.hora_i} - ${data.horario.hora_f}`;
+          document.getElementById('resultAula').textContent = `Aula ${data.horario.aula.nro_aula} - Módulo ${data.horario.aula.modulo}`;
+          document.getElementById('horarioEncontrado').classList.remove('hidden');
+          document.getElementById('errorAutomatico').classList.add('hidden');
+          
+          // Mostrar botón guardar
+          document.getElementById('btnBuscar').classList.add('hidden');
+          document.getElementById('btnGuardarAuto').classList.remove('hidden');
+        } else {
+          // Mostrar error
+          document.getElementById('errorAutomatico').querySelector('p').textContent = data.message;
+          document.getElementById('errorAutomatico').classList.remove('hidden');
+          document.getElementById('horarioEncontrado').classList.add('hidden');
+        }
+      } catch (error) {
+        console.error('Error:', error);
+        alert('Error al buscar horario disponible');
+      } finally {
+        btnBuscar.disabled = false;
+        btnBuscar.textContent = 'Buscar Horario';
+      }
+    }
+
+    // Guardar horario automático
+    async function guardarHorarioAutomatico() {
+      if (!horarioAutomaticoData) {
+        alert('No hay horario para guardar');
+        return;
+      }
+
+      const idCarga = document.getElementById('autoModalCarga').value;
+      const btnGuardar = document.getElementById('btnGuardarAuto');
+      btnGuardar.disabled = true;
+      btnGuardar.textContent = 'Guardando...';
+
+      try {
+        // Crear un formulario y enviarlo
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = '{{ route("horarios.store") }}';
+        
+        // CSRF Token
+        const csrfInput = document.createElement('input');
+        csrfInput.type = 'hidden';
+        csrfInput.name = '_token';
+        csrfInput.value = document.querySelector('meta[name="csrf-token"]').content;
+        form.appendChild(csrfInput);
+
+        // Campos del horario
+        const fields = {
+          dia: horarioAutomaticoData.dia,
+          hora_i: horarioAutomaticoData.hora_i,
+          hora_f: horarioAutomaticoData.hora_f,
+          id_carga: idCarga,
+          id_aula: horarioAutomaticoData.id_aula
+        };
+
+        Object.keys(fields).forEach(key => {
+          const input = document.createElement('input');
+          input.type = 'hidden';
+          input.name = key;
+          input.value = fields[key];
+          form.appendChild(input);
+        });
+
+        document.body.appendChild(form);
+        form.submit();
+      } catch (error) {
+        console.error('Error:', error);
+        alert('Error al guardar el horario');
+        btnGuardar.disabled = false;
+        btnGuardar.textContent = 'Guardar Horario';
+      }
     }
 
     // Verificar conflictos vía AJAX
@@ -430,6 +657,7 @@
     document.addEventListener('keydown', function(e) {
       if (e.key === 'Escape') {
         closeModal();
+        closeModalAutomatico();
       }
     });
 
@@ -437,6 +665,13 @@
     document.getElementById('modalHorario').addEventListener('click', function(e) {
       if (e.target === this) {
         closeModal();
+      }
+    });
+
+    // Cerrar modal automático al hacer clic fuera
+    document.getElementById('modalAutomatico').addEventListener('click', function(e) {
+      if (e.target === this) {
+        closeModalAutomatico();
       }
     });
   </script>

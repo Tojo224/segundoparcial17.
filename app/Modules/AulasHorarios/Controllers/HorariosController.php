@@ -309,4 +309,40 @@ class HorariosController extends Controller
             'conflictos' => $conflictos
         ]);
     }
+
+    /**
+     * API para encontrar horario disponible automáticamente (AJAX)
+     */
+    public function encontrarDisponibleAPI(Request $request): JsonResponse
+    {
+        $v = Validator::make($request->all(), [
+            'id_carga' => 'required|exists:carga_horaria,id_carga',
+            'duracion_horas' => 'nullable|integer|min:1|max:4'
+        ]);
+
+        if ($v->fails()) {
+            return response()->json([
+                'success' => false,
+                'errors' => $v->errors()
+            ], 422);
+        }
+
+        $duracionHoras = $request->duracion_horas ?? 2;
+        $horarioDisponible = $this->service->encontrarHorarioDisponible(
+            $request->id_carga,
+            $duracionHoras
+        );
+
+        if ($horarioDisponible) {
+            return response()->json([
+                'success' => true,
+                'horario' => $horarioDisponible
+            ]);
+        } else {
+            return response()->json([
+                'success' => false,
+                'message' => 'No se encontró ningún horario disponible. Todos los espacios están ocupados.'
+            ], 404);
+        }
+    }
 }

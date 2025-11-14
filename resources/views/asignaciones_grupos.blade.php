@@ -42,7 +42,15 @@
       <div class="pt-2 pb-1">
         <p class="px-3 text-xs font-semibold text-slate-400 uppercase">Aulas y Horarios</p>
       </div>
+      <a href="{{ route('aulas.vista') }}" class="block px-3 py-2 rounded-md hover:bg-slate-800">Gestionar Aulas</a>
       <a href="{{ route('horarios.calendario') }}" class="block px-3 py-2 rounded-md hover:bg-slate-800">Gestionar Horarios</a>
+      <a href="{{ route('reservas.vista') }}" class="block px-3 py-2 rounded-md hover:bg-slate-800">Reservas de Aulas</a>
+      
+      <!-- Control de Asistencia -->
+      <div class="pt-2 pb-1">
+        <p class="px-3 text-xs font-semibold text-slate-400 uppercase">Asistencia</p>
+      </div>
+      <a href="{{ route('asistencia.vista') }}" class="block px-3 py-2 rounded-md hover:bg-slate-800">Registrar Asistencia</a>
       
       <!-- Administración -->
       <div class="pt-2 pb-1">

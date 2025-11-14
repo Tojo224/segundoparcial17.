@@ -8,7 +8,8 @@ use App\Modules\GestionAcademica\Controllers\DocentesController;
 use App\Modules\GestionAcademica\Controllers\MateriasController;
 use App\Modules\GestionAcademica\Controllers\GruposController;
 use App\Modules\GestionAcademica\Controllers\CargaHorariaController;
-use App\Modules\AulasHorarios\Controllers\HorariosController;
+use App\Modules\AulasHorarios\Controllers\{HorariosController, AulasController, ReservasController};
+use App\Modules\ControlAsistencia\Controllers\AsistenciaController;
 
 Route::get('/', function () { return redirect('/login'); });
 
@@ -66,6 +67,30 @@ Route::middleware('auth')->group(function () {
     Route::put('/horarios/{id}', [HorariosController::class, 'updateWeb'])->name('horarios.update');
     Route::delete('/horarios/{id}', [HorariosController::class, 'destroyWeb'])->name('horarios.destroy');
     Route::post('/horarios/verificar-conflictos', [HorariosController::class, 'verificarConflictosAPI'])->name('horarios.verificar-conflictos');
+    Route::post('/horarios/encontrar-disponible', [HorariosController::class, 'encontrarDisponibleAPI'])->name('horarios.encontrar-disponible');
+
+    // CU13 - Gestionar Aulas
+    Route::get('/aulas', [AulasController::class, 'vistaAulas'])->name('aulas.vista');
+    Route::post('/aulas', [AulasController::class, 'storeWeb'])->name('aulas.store');
+    Route::put('/aulas/{id}', [AulasController::class, 'updateWeb'])->name('aulas.update');
+    Route::delete('/aulas/{id}', [AulasController::class, 'destroyWeb'])->name('aulas.destroy');
+    Route::get('/aulas/{id}/disponibilidad', [AulasController::class, 'verificarDisponibilidadAPI'])->name('aulas.disponibilidad');
+
+    // CU14 - Gestionar Reservas de Aulas
+    Route::get('/reservas', [ReservasController::class, 'vistaReservas'])->name('reservas.vista');
+    Route::post('/reservas', [ReservasController::class, 'storeWeb'])->name('reservas.store');
+    Route::put('/reservas/{id}', [ReservasController::class, 'updateWeb'])->name('reservas.update');
+    Route::delete('/reservas/{id}', [ReservasController::class, 'destroyWeb'])->name('reservas.destroy');
+    Route::post('/reservas/verificar-conflictos', [ReservasController::class, 'verificarConflictosAPI'])->name('reservas.verificar-conflictos');
+    Route::post('/reservas/disponibilidad', [ReservasController::class, 'getDisponibilidadAPI'])->name('reservas.disponibilidad');
+
+    // CU15 - Registrar Asistencia Docente
+    Route::get('/asistencia', [AsistenciaController::class, 'vistaAsistencia'])->name('asistencia.vista');
+    Route::post('/asistencia', [AsistenciaController::class, 'storeWeb'])->name('asistencia.store');
+    Route::put('/asistencia/{id}', [AsistenciaController::class, 'updateWeb'])->name('asistencia.update');
+    Route::delete('/asistencia/{id}', [AsistenciaController::class, 'destroyWeb'])->name('asistencia.destroy');
+    Route::get('/asistencia/horarios-fecha', [AsistenciaController::class, 'getHorariosPorFecha'])->name('asistencia.horarios-fecha');
+    Route::get('/asistencia/estadisticas', [AsistenciaController::class, 'getEstadisticas'])->name('asistencia.estadisticas');
 });
 
 // Cargar rutas API (roles, usuarios, bitácora)
