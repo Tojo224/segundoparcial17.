@@ -219,4 +219,131 @@ class UsuariosController extends Controller
         $usuarios = $this->usuariosService->all();
         return view('usuarios', compact('usuarios'));
     }
+
+    /**
+     * Crear usuario desde formulario web
+     */
+    public function storeWeb(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'CI' => 'required|unique:usuario,ci',
+            'nombre' => 'required|string|max:100',
+            'telefono' => 'nullable|string|max:20',
+            'direccion' => 'nullable|string|max:150',
+            'correo' => 'required|email|unique:usuario,correo',
+            'sexo' => 'required|in:M,F',
+            'estado_civil' => 'required|string|max:20',
+            'estado' => 'nullable|boolean',
+            'contraseña' => 'required|min:6',
+            'id_rol' => 'required|exists:roles,id_rol'
+        ]);
+
+        if ($validator->fails()) {
+            return back()->withErrors($validator)->withInput();
+        }
+
+        $data = [
+            'ci' => $request->CI,
+            'nombre' => $request->nombre,
+            'telefono' => $request->telefono,
+            'direccion' => $request->direccion,
+            'correo' => $request->correo,
+            'sexo' => $request->sexo,
+            'estado_civil' => $request->estado_civil,
+            'estado' => $request->has('estado') ? true : false,
+            'contraseña' => $request->contraseña,
+            'id_rol' => $request->id_rol,
+            'cambiar_contra' => true,
+        ];
+        
+        $usuario = $this->usuariosService->create($data);
+
+        // Registrar acción en bitácora
+        $usuarioActual = Auth::user();
+        if ($usuarioActual) {
+            $this->bitacoraService->registrar(
+                "{$usuarioActual->nombre} creó un nuevo usuario: {$usuario->nombre}",
+                $usuarioActual->id_usuario
+            );
+        }
+
+        return redirect()->route('usuarios.vista')->with('success', 'Usuario registrado exitosamente');
+    }
+
+    /**
+     * Actualizar usuario desde formulario web
+     */
+    public function updateWeb(Request $request, $id)
+    {
+        $usuario = $this->usuariosService->find($id);
+        if (!$usuario) {
+            return back()->with('error', 'Usuario no encontrado');
+        }
+
+        $validator = Validator::make($request->all(), [
+            'CI' => 'nullable|unique:usuario,ci,' . $id . ',id_usuario',
+            'nombre' => 'nullable|string|max:100',
+            'telefono' => 'nullable|string|max:20',
+            'direccion' => 'nullable|string|max:150',
+            'correo' => 'nullable|email|unique:usuario,correo,' . $id . ',id_usuario',
+            'sexo' => 'nullable|in:M,F',
+            'estado_civil' => 'nullable|string|max:20',
+            'estado' => 'nullable|boolean',
+            'contraseña' => 'nullable|min:6',
+            'id_rol' => 'nullable|exists:roles,id_rol'
+        ]);
+
+        if ($validator->fails()) {
+            return back()->withErrors($validator)->withInput();
+        }
+
+        $data = [];
+        if ($request->filled('CI')) $data['ci'] = $request->CI;
+        if ($request->filled('nombre')) $data['nombre'] = $request->nombre;
+        if ($request->filled('telefono')) $data['telefono'] = $request->telefono;
+        if ($request->filled('direccion')) $data['direccion'] = $request->direccion;
+        if ($request->filled('correo')) $data['correo'] = $request->correo;
+        if ($request->filled('sexo')) $data['sexo'] = $request->sexo;
+        if ($request->filled('estado_civil')) $data['estado_civil'] = $request->estado_civil;
+        $data['estado'] = $request->has('estado') ? true : false;
+        if ($request->filled('contraseña')) $data['contraseña'] = $request->contraseña;
+        if ($request->filled('id_rol')) $data['id_rol'] = $request->id_rol;
+        
+        $usuarioActualizado = $this->usuariosService->update($id, $data);
+
+        // Registrar acción en bitácora
+        $usuarioActual = Auth::user();
+        if ($usuarioActual) {
+            $this->bitacoraService->registrar(
+                "{$usuarioActual->nombre} actualizó el usuario: {$usuarioActualizado->nombre}",
+                $usuarioActual->id_usuario
+            );
+        }
+
+        return redirect()->route('usuarios.vista')->with('success', 'Usuario actualizado exitosamente');
+    }
+
+    /**
+     * Eliminar usuario desde formulario web
+     */
+    public function destroyWeb($id)
+    {
+        $usuario = $this->usuariosService->find($id);
+        if (!$usuario) {
+            return back()->with('error', 'Usuario no encontrado');
+        }
+
+        $this->usuariosService->delete($id);
+
+        // Registrar acción en bitácora
+        $usuarioActual = Auth::user();
+        if ($usuarioActual) {
+            $this->bitacoraService->registrar(
+                "{$usuarioActual->nombre} desactivó el usuario: {$usuario->nombre}",
+                $usuarioActual->id_usuario
+            );
+        }
+
+        return redirect()->route('usuarios.vista')->with('success', 'Usuario desactivado exitosamente');
+    }
 }

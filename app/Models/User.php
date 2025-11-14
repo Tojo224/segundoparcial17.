@@ -45,4 +45,12 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+
+    /**
+     * Accessor para compatibilidad con 'nombre'
+     */
+    public function getNombreAttribute()
+    {
+        return $this->name;
+    }
 }

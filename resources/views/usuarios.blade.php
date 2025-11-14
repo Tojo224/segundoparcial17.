@@ -26,8 +26,39 @@
     </div>
     <nav class="p-4 space-y-2">
       <a href="/" class="block px-3 py-2 rounded-md hover:bg-slate-800">Dashboard</a>
+      
+      <!-- Gestión Académica -->
+      <div class="pt-2 pb-1">
+        <p class="px-3 text-xs font-semibold text-slate-400 uppercase">Académico</p>
+      </div>
+      <a href="{{ route('docentes.vista') }}" class="block px-3 py-2 rounded-md hover:bg-slate-800">Gestionar Docentes</a>
+      <a href="{{ route('materias.vista') }}" class="block px-3 py-2 rounded-md hover:bg-slate-800">Gestionar Materias</a>
+      <a href="{{ route('grupos.vista') }}" class="block px-3 py-2 rounded-md hover:bg-slate-800">Gestionar Grupos</a>
+      <a href="{{ route('carga-horaria.asignar') }}" class="block px-3 py-2 rounded-md hover:bg-slate-800">Asignar Grupos</a>
+      <a href="{{ route('carga-horaria.vista') }}" class="block px-3 py-2 rounded-md hover:bg-slate-800">Ver Asignaciones</a>
+      
+      <!-- Aulas y Horarios -->
+      <div class="pt-2 pb-1">
+        <p class="px-3 text-xs font-semibold text-slate-400 uppercase">Aulas y Horarios</p>
+      </div>
+      <a href="{{ route('aulas.vista') }}" class="block px-3 py-2 rounded-md hover:bg-slate-800">Gestionar Aulas</a>
+      <a href="{{ route('horarios.calendario') }}" class="block px-3 py-2 rounded-md hover:bg-slate-800">Gestionar Horarios</a>
+      <a href="{{ route('reservas.vista') }}" class="block px-3 py-2 rounded-md hover:bg-slate-800">Reservas de Aulas</a>
+      
+      <!-- Control de Asistencia -->
+      <div class="pt-2 pb-1">
+        <p class="px-3 text-xs font-semibold text-slate-400 uppercase">Asistencia</p>
+      </div>
+      <a href="{{ route('asistencia.vista') }}" class="block px-3 py-2 rounded-md hover:bg-slate-800">Registrar Asistencia</a>
+      
+      <!-- Administración -->
+      <div class="pt-2 pb-1">
+        <p class="px-3 text-xs font-semibold text-slate-400 uppercase">Administración</p>
+      </div>
       <a href="{{ route('usuarios.vista') }}" class="block px-3 py-2 rounded-md bg-blue-700">Gestionar Usuarios</a>
-      <!-- Botón real de Cerrar Sesión -->
+      <a href="{{ route('bitacora.vista') }}" class="block px-3 py-2 rounded-md hover:bg-slate-800">Bitácora</a>
+      
+    <!-- Botón real de Cerrar Sesión -->
     <form method="POST" action="{{ route('logout') }}" class="mt-4">
     @csrf
     <button type="submit"
@@ -76,12 +107,25 @@
         </div>
       </div>
       <div class="bg-white shadow rounded-xl p-4 text-center">
-        <div class="text-sm text-slate-500">Auxiliares</div>
+        <div class="text-sm text-slate-500">Coordinadores</div>
         <div class="text-3xl font-bold text-indigo-600">
-          {{ $usuarios->where('id_rol', 3)->count() }}
+          {{ $usuarios->where('id_rol', 5)->count() }}
         </div>
       </div>
     </div>
+
+    <!-- Mensajes de éxito/error -->
+    @if (session('success'))
+      <div class="p-4 bg-green-50 border border-green-200 rounded-lg">
+        <p class="text-green-700 font-semibold">✓ {{ session('success') }}</p>
+      </div>
+    @endif
+
+    @if (session('error'))
+      <div class="p-4 bg-red-50 border border-red-200 rounded-lg">
+        <p class="text-red-700 font-semibold">✗ {{ session('error') }}</p>
+      </div>
+    @endif
 
     <!-- Botones superiores -->
     <div class="flex flex-wrap gap-3 items-center">
@@ -143,24 +187,153 @@
     </div>
 
     <!-- Modal Crear Usuario -->
-    <dialog id="crearModal" class="rounded-xl p-6 w-[95%] max-w-md">
-      <form method="POST" action="{{ route('usuarios.store') }}" class="space-y-3">
+    <dialog id="crearModal" class="rounded-xl p-6 w-[95%] max-w-2xl max-h-[90vh] overflow-y-auto">
+      <form method="POST" action="{{ route('usuarios.store') }}" class="space-y-4">
         @csrf
-        <h2 class="text-lg font-bold">Registrar Usuario</h2>
-        <input name="nombre" required class="border rounded-md w-full p-2" placeholder="Nombre completo">
-        <input name="correo" required type="email" class="border rounded-md w-full p-2" placeholder="Correo">
-        <input name="telefono" class="border rounded-md w-full p-2" placeholder="Teléfono">
-        <input name="direccion" class="border rounded-md w-full p-2" placeholder="Dirección">
-        <input name="contraseña" required type="password" class="border rounded-md w-full p-2" placeholder="Contraseña">
-        <select name="id_rol" class="border rounded-md w-full p-2">
-          <option value="">Seleccione rol</option>
-          <option value="1">Administrador</option>
-          <option value="2">Docente</option>
-          <option value="3">Auxiliar</option>
-        </select>
-        <div class="flex justify-end gap-2 mt-4">
-          <button type="button" onclick="document.getElementById('crearModal').close()" class="px-3 py-2 bg-slate-200 rounded-md">Cancelar</button>
-          <button type="submit" class="px-3 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">Guardar</button>
+        <h2 class="text-lg font-bold">Registrar Nuevo Usuario</h2>
+        
+        @if ($errors->any())
+          <div class="p-3 bg-red-50 border border-red-200 rounded-md">
+            <p class="text-red-700 font-semibold text-sm mb-2">Errores encontrados:</p>
+            <ul class="text-red-600 text-xs space-y-1">
+              @foreach ($errors->all() as $error)
+                <li>• {{ $error }}</li>
+              @endforeach
+            </ul>
+          </div>
+        @endif
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+          <!-- CI (Cédula de Identidad) -->
+          <div>
+            <label class="block text-sm font-medium text-slate-700 mb-1">CI *</label>
+            <input type="text" name="CI" value="{{ old('CI') }}" required 
+                   class="border border-slate-300 rounded-md w-full p-2 text-sm" 
+                   placeholder="Ej: 12345678">
+            @error('CI')
+              <span class="text-red-500 text-xs mt-1 block">{{ $message }}</span>
+            @enderror
+          </div>
+
+          <!-- Nombre -->
+          <div>
+            <label class="block text-sm font-medium text-slate-700 mb-1">Nombre Completo *</label>
+            <input type="text" name="nombre" value="{{ old('nombre') }}" required 
+                   class="border border-slate-300 rounded-md w-full p-2 text-sm" 
+                   placeholder="Nombre completo">
+            @error('nombre')
+              <span class="text-red-500 text-xs mt-1 block">{{ $message }}</span>
+            @enderror
+          </div>
+
+          <!-- Correo -->
+          <div>
+            <label class="block text-sm font-medium text-slate-700 mb-1">Correo Electrónico *</label>
+            <input type="email" name="correo" value="{{ old('correo') }}" required 
+                   class="border border-slate-300 rounded-md w-full p-2 text-sm" 
+                   placeholder="correo@ejemplo.com">
+            @error('correo')
+              <span class="text-red-500 text-xs mt-1 block">{{ $message }}</span>
+            @enderror
+          </div>
+
+          <!-- Teléfono -->
+          <div>
+            <label class="block text-sm font-medium text-slate-700 mb-1">Teléfono</label>
+            <input type="text" name="telefono" value="{{ old('telefono') }}" 
+                   class="border border-slate-300 rounded-md w-full p-2 text-sm" 
+                   placeholder="Teléfono">
+            @error('telefono')
+              <span class="text-red-500 text-xs mt-1 block">{{ $message }}</span>
+            @enderror
+          </div>
+
+          <!-- Dirección -->
+          <div class="md:col-span-2">
+            <label class="block text-sm font-medium text-slate-700 mb-1">Dirección</label>
+            <input type="text" name="direccion" value="{{ old('direccion') }}" 
+                   class="border border-slate-300 rounded-md w-full p-2 text-sm" 
+                   placeholder="Dirección">
+            @error('direccion')
+              <span class="text-red-500 text-xs mt-1 block">{{ $message }}</span>
+            @enderror
+          </div>
+
+          <!-- Sexo -->
+          <div>
+            <label class="block text-sm font-medium text-slate-700 mb-1">Sexo *</label>
+            <select name="sexo" required class="border border-slate-300 rounded-md w-full p-2 text-sm">
+              <option value="">Seleccione</option>
+              <option value="M" {{ old('sexo') === 'M' ? 'selected' : '' }}>Masculino</option>
+              <option value="F" {{ old('sexo') === 'F' ? 'selected' : '' }}>Femenino</option>
+            </select>
+            @error('sexo')
+              <span class="text-red-500 text-xs mt-1 block">{{ $message }}</span>
+            @enderror
+          </div>
+
+          <!-- Estado Civil -->
+          <div>
+            <label class="block text-sm font-medium text-slate-700 mb-1">Estado Civil *</label>
+            <select name="estado_civil" required class="border border-slate-300 rounded-md w-full p-2 text-sm">
+              <option value="">Seleccione</option>
+              <option value="Soltero" {{ old('estado_civil') === 'Soltero' ? 'selected' : '' }}>Soltero</option>
+              <option value="Casado" {{ old('estado_civil') === 'Casado' ? 'selected' : '' }}>Casado</option>
+              <option value="Divorciado" {{ old('estado_civil') === 'Divorciado' ? 'selected' : '' }}>Divorciado</option>
+              <option value="Viudo" {{ old('estado_civil') === 'Viudo' ? 'selected' : '' }}>Viudo</option>
+            </select>
+            @error('estado_civil')
+              <span class="text-red-500 text-xs mt-1 block">{{ $message }}</span>
+            @enderror
+          </div>
+
+          <!-- Contraseña -->
+          <div>
+            <label class="block text-sm font-medium text-slate-700 mb-1">Contraseña *</label>
+            <input type="password" name="contraseña" required 
+                   class="border border-slate-300 rounded-md w-full p-2 text-sm" 
+                   placeholder="Mínimo 6 caracteres">
+            @error('contraseña')
+              <span class="text-red-500 text-xs mt-1 block">{{ $message }}</span>
+            @enderror
+          </div>
+
+          <!-- Rol -->
+          <div>
+            <label class="block text-sm font-medium text-slate-700 mb-1">Rol *</label>
+            <select name="id_rol" required class="border border-slate-300 rounded-md w-full p-2 text-sm">
+              <option value="">Seleccione rol</option>
+              <option value="1" {{ old('id_rol') === '1' ? 'selected' : '' }}>Administrador</option>
+              <option value="2" {{ old('id_rol') === '2' ? 'selected' : '' }}>Docente</option>
+              <option value="3" {{ old('id_rol') === '3' ? 'selected' : '' }}>Auxiliar</option>
+              <option value="4" {{ old('id_rol') === '4' ? 'selected' : '' }}>Autoridad</option>
+              <option value="5" {{ old('id_rol') === '5' ? 'selected' : '' }}>Coordinador</option>
+            </select>
+            @error('id_rol')
+              <span class="text-red-500 text-xs mt-1 block">{{ $message }}</span>
+            @enderror
+          </div>
+
+          <!-- Estado -->
+          <div class="flex items-center gap-2 pt-2">
+            <input type="checkbox" id="estado" name="estado" value="1" 
+                   {{ old('estado', '1') === '1' || old('estado') === 1 ? 'checked' : '' }} 
+                   class="w-4 h-4 rounded">
+            <label for="estado" class="text-sm font-medium text-slate-700">Usuario Activo</label>
+            @error('estado')
+              <span class="text-red-500 text-xs mt-1 block">{{ $message }}</span>
+            @enderror
+          </div>
+        </div>
+
+        <div class="flex justify-end gap-2 mt-4 pt-4 border-t">
+          <button type="button" onclick="document.getElementById('crearModal').close()" 
+                  class="px-4 py-2 bg-slate-200 text-slate-700 rounded-md hover:bg-slate-300 text-sm font-medium">
+            Cancelar
+          </button>
+          <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 text-sm font-medium">
+            Registrar Usuario
+          </button>
         </div>
       </form>
     </dialog>

@@ -7,6 +7,9 @@ use App\Modules\AdministracionUsuariosSeguridad\Controllers\BitacoraController;
 use App\Modules\GestionAcademica\Controllers\DocentesController;
 use App\Modules\GestionAcademica\Controllers\MateriasController;
 use App\Modules\GestionAcademica\Controllers\GruposController;
+use App\Modules\GestionAcademica\Controllers\CargaHorariaController;
+use App\Modules\AulasHorarios\Controllers\{HorariosController, AulasController, ReservasController};
+use App\Modules\ControlAsistencia\Controllers\AsistenciaController;
 use App\Modules\ReportesYDashboard\Controllers\ReportesController;
 use App\Modules\ReportesYDashboard\Controllers\DashboardController;
 
@@ -34,9 +37,9 @@ Route::middleware('auth')->group(function () {
 
     // Vista dinámica de gestión de usuarios
     Route::get('/usuarios', [UsuariosController::class, 'vistaUsuarios'])->name('usuarios.vista');
-    Route::post('/usuarios', [UsuariosController::class, 'store'])->name('usuarios.store');
-    Route::put('/usuarios/{id}', [UsuariosController::class, 'update'])->name('usuarios.update');
-    Route::delete('/usuarios/{id}', [UsuariosController::class, 'destroy'])->name('usuarios.destroy');
+    Route::post('/usuarios', [UsuariosController::class, 'storeWeb'])->name('usuarios.store');
+    Route::put('/usuarios/{id}', [UsuariosController::class, 'updateWeb'])->name('usuarios.update');
+    Route::delete('/usuarios/{id}', [UsuariosController::class, 'destroyWeb'])->name('usuarios.destroy');
 
     Route::get('/bitacora', [BitacoraController::class, 'vistaBitacora'])->name('bitacora.vista');
     
@@ -53,6 +56,43 @@ Route::middleware('auth')->group(function () {
     Route::post('/grupos', [GruposController::class, 'storeWeb'])->name('grupos.store');
     Route::put('/grupos/{id}', [GruposController::class, 'updateWeb'])->name('grupos.update'); 
     Route::delete('/grupos/{id}', [GruposController::class, 'destroyWeb'])->name('grupos.destroy');
+
+    // CU10 - Asignar Grupos a Docentes (Carga Horaria)
+    Route::get('/asignar-grupos', [CargaHorariaController::class, 'vistaAsignarGrupos'])->name('carga-horaria.asignar');
+    Route::post('/asignar-grupos', [CargaHorariaController::class, 'asignarGrupoWeb'])->name('carga-horaria.asignar.store');
+    Route::delete('/asignar-grupos/{id}', [CargaHorariaController::class, 'eliminarAsignacionWeb'])->name('carga-horaria.eliminar');
+    Route::get('/asignaciones-grupos', [CargaHorariaController::class, 'vistaAsignaciones'])->name('carga-horaria.vista');
+
+    // CU11 - Gestionar Horarios
+    Route::get('/horarios', [HorariosController::class, 'vistaCalendario'])->name('horarios.calendario');
+    Route::post('/horarios', [HorariosController::class, 'storeWeb'])->name('horarios.store');
+    Route::put('/horarios/{id}', [HorariosController::class, 'updateWeb'])->name('horarios.update');
+    Route::delete('/horarios/{id}', [HorariosController::class, 'destroyWeb'])->name('horarios.destroy');
+    Route::post('/horarios/verificar-conflictos', [HorariosController::class, 'verificarConflictosAPI'])->name('horarios.verificar-conflictos');
+    Route::post('/horarios/encontrar-disponible', [HorariosController::class, 'encontrarDisponibleAPI'])->name('horarios.encontrar-disponible');
+
+    // CU13 - Gestionar Aulas
+    Route::get('/aulas', [AulasController::class, 'vistaAulas'])->name('aulas.vista');
+    Route::post('/aulas', [AulasController::class, 'storeWeb'])->name('aulas.store');
+    Route::put('/aulas/{id}', [AulasController::class, 'updateWeb'])->name('aulas.update');
+    Route::delete('/aulas/{id}', [AulasController::class, 'destroyWeb'])->name('aulas.destroy');
+    Route::get('/aulas/{id}/disponibilidad', [AulasController::class, 'verificarDisponibilidadAPI'])->name('aulas.disponibilidad');
+
+    // CU14 - Gestionar Reservas de Aulas
+    Route::get('/reservas', [ReservasController::class, 'vistaReservas'])->name('reservas.vista');
+    Route::post('/reservas', [ReservasController::class, 'storeWeb'])->name('reservas.store');
+    Route::put('/reservas/{id}', [ReservasController::class, 'updateWeb'])->name('reservas.update');
+    Route::delete('/reservas/{id}', [ReservasController::class, 'destroyWeb'])->name('reservas.destroy');
+    Route::post('/reservas/verificar-conflictos', [ReservasController::class, 'verificarConflictosAPI'])->name('reservas.verificar-conflictos');
+    Route::post('/reservas/disponibilidad', [ReservasController::class, 'getDisponibilidadAPI'])->name('reservas.disponibilidad');
+
+    // CU15 - Registrar Asistencia Docente
+    Route::get('/asistencia', [AsistenciaController::class, 'vistaAsistencia'])->name('asistencia.vista');
+    Route::post('/asistencia', [AsistenciaController::class, 'storeWeb'])->name('asistencia.store');
+    Route::put('/asistencia/{id}', [AsistenciaController::class, 'updateWeb'])->name('asistencia.update');
+    Route::delete('/asistencia/{id}', [AsistenciaController::class, 'destroyWeb'])->name('asistencia.destroy');
+    Route::get('/asistencia/horarios-fecha', [AsistenciaController::class, 'getHorariosPorFecha'])->name('asistencia.horarios-fecha');
+    Route::get('/asistencia/estadisticas', [AsistenciaController::class, 'getEstadisticas'])->name('asistencia.estadisticas');
 
     // Rutas de Reportes y Dashboard (CU17, CU18, CU19)
     Route::get('/reportes', [ReportesController::class, 'vistaReportes'])->name('reportes.vista');

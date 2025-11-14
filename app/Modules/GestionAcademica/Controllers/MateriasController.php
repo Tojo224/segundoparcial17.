@@ -5,10 +5,10 @@ namespace App\Modules\GestionAcademica\Controllers;
 use App\Http\Controllers\Controller;
 use App\Modules\GestionAcademica\Services\MateriasService;
 use App\Modules\AdministracionUsuariosSeguridad\Services\BitacoraService;
-use App\Modules\GestionAcademica\Models\Materia;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Auth;
 
 class MateriasController extends Controller
 {
@@ -39,18 +39,18 @@ class MateriasController extends Controller
     public function store(Request $request): JsonResponse
     {
         $v = Validator::make($request->all(), [
-            'sigla' => 'required|string|max:20|unique:materia,sigla',
-            'nombre' => 'required|string|max:255|unique:materia,nombre',
+            'sigla' => 'required|string|max:10|unique:materia,sigla',
+            'nombre' => 'required|string|max:255',
         ]);
         if ($v->fails()) return response()->json(['success' => false, 'errors' => $v->errors()], 422);
 
         $item = $this->service->create($v->validated());
 
-        // 🔹 Bitácora
-        $usuario = auth()->user();
+        // Bitácora
+        $usuario = Auth::user();
         if ($usuario) {
             $this->bitacora->registrar(
-                "{$usuario->nombre} registró la materia {$item->sigla} - {$item->nombre}",
+                "{$usuario->nombre} creó la materia {$item->nombre} ({$item->sigla})",
                 $usuario->id_usuario
             );
         }
@@ -64,18 +64,18 @@ class MateriasController extends Controller
         if (!$exists) return response()->json(['success' => false, 'message' => 'Materia no encontrada'], 404);
 
         $v = Validator::make($request->all(), [
-            'sigla' => 'string|max:20|unique:materia,sigla,' . $id . ',id_materia',
-            'nombre' => 'string|max:255|unique:materia,nombre,' . $id . ',id_materia',
+            'sigla' => 'string|max:10|unique:materia,sigla,' . $id . ',id_materia',
+            'nombre' => 'string|max:255',
         ]);
         if ($v->fails()) return response()->json(['success' => false, 'errors' => $v->errors()], 422);
 
         $item = $this->service->update($id, $v->validated());
 
-        // 🔹 Bitácora
-        $usuario = auth()->user();
+        // Bitácora
+        $usuario = Auth::user();
         if ($usuario) {
             $this->bitacora->registrar(
-                "{$usuario->nombre} actualizó la materia {$item->sigla} - {$item->nombre}",
+                "{$usuario->nombre} actualizó la materia {$item->nombre} ({$item->sigla})",
                 $usuario->id_usuario
             );
         }
@@ -90,11 +90,11 @@ class MateriasController extends Controller
 
         $this->service->delete($id);
 
-        // 🔹 Bitácora
-        $usuario = auth()->user();
+        // Bitácora
+        $usuario = Auth::user();
         if ($usuario) {
             $this->bitacora->registrar(
-                "{$usuario->nombre} eliminó la materia {$materia->sigla} - {$materia->nombre}",
+                "{$usuario->nombre} eliminó la materia {$materia->nombre} ({$materia->sigla})",
                 $usuario->id_usuario
             );
         }
@@ -110,6 +110,7 @@ class MateriasController extends Controller
 
         if ($buscar) {
             $filters['nombre'] = $buscar;
+            $filters['sigla'] = $buscar;
         }
 
         $materias = $this->service->paginate(10, $filters);
@@ -119,56 +120,64 @@ class MateriasController extends Controller
     public function storeWeb(Request $request)
     {
         $v = Validator::make($request->all(), [
-            'sigla' => 'required|string|max:20|unique:materia,sigla',
-            'nombre' => 'required|string|max:255|unique:materia,nombre',
+            'sigla' => 'required|string|max:10|unique:materia,sigla',
+            'nombre' => 'required|string|max:255',
         ]);
 
         if ($v->fails()) {
             return back()->withErrors($v)->withInput();
         }
 
-        $materia = $this->service->create($v->validated());
+        try {
+            $materia = $this->service->create($v->validated());
 
-        // 🔹 Bitácora
-        $usuario = auth()->user();
-        if ($usuario) {
-            $this->bitacora->registrar(
-                "{$usuario->nombre} registró la materia {$materia->sigla} - {$materia->nombre}",
-                $usuario->id_usuario
-            );
+            // Bitácora
+            $usuario = Auth::user();
+            if ($usuario) {
+                $this->bitacora->registrar(
+                    "{$usuario->nombre} registró la materia {$materia->nombre} ({$materia->sigla})",
+                    $usuario->id_usuario
+                );
+            }
+
+            return redirect()->route('materias.vista')->with('success', 'Materia registrada correctamente.');
+        } catch (\Exception $e) {
+            return back()->withErrors(['error' => 'Error al registrar: ' . $e->getMessage()])->withInput();
         }
-
-        return redirect()->route('materias.vista')->with('success', 'Materia registrada correctamente.');
     }
 
     public function updateWeb(Request $request, $id)
     {
-        $materia = $this->service->find($id);
-        if (!$materia) {
+        $exists = $this->service->find($id);
+        if (!$exists) {
             return redirect()->route('materias.vista')->with('error', 'Materia no encontrada.');
         }
 
         $v = Validator::make($request->all(), [
-            'sigla' => 'required|string|max:20|unique:materia,sigla,' . $id . ',id_materia',
-            'nombre' => 'required|string|max:255|unique:materia,nombre,' . $id . ',id_materia',
+            'sigla' => 'required|string|max:10|unique:materia,sigla,' . $id . ',id_materia',
+            'nombre' => 'required|string|max:255',
         ]);
 
         if ($v->fails()) {
             return back()->withErrors($v)->withInput();
         }
 
-        $materia = $this->service->update($id, $v->validated());
+        try {
+            $materia = $this->service->update($id, $v->validated());
 
-        // 🔹 Bitácora
-        $usuario = auth()->user();
-        if ($usuario) {
-            $this->bitacora->registrar(
-                "{$usuario->nombre} actualizó la materia {$materia->sigla} - {$materia->nombre}",
-                $usuario->id_usuario
-            );
+            // Bitácora
+            $usuario = Auth::user();
+            if ($usuario) {
+                $this->bitacora->registrar(
+                    "{$usuario->nombre} actualizó la materia {$materia->nombre} ({$materia->sigla})",
+                    $usuario->id_usuario
+                );
+            }
+
+            return redirect()->route('materias.vista')->with('success', 'Materia actualizada correctamente.');
+        } catch (\Exception $e) {
+            return back()->withErrors(['error' => 'Error al actualizar: ' . $e->getMessage()])->withInput();
         }
-
-        return redirect()->route('materias.vista')->with('success', 'Materia actualizada correctamente.');
     }
 
     public function destroyWeb($id)
@@ -179,23 +188,23 @@ class MateriasController extends Controller
         }
 
         try {
-            $sigla = $materia->sigla;
             $nombre = $materia->nombre;
+            $sigla = $materia->sigla;
 
             $this->service->delete($id);
 
-            // 🔹 Bitácora
-            $usuario = auth()->user();
+            // Bitácora
+            $usuario = Auth::user();
             if ($usuario) {
                 $this->bitacora->registrar(
-                    "{$usuario->nombre} eliminó la materia {$sigla} - {$nombre}",
+                    "{$usuario->nombre} eliminó la materia {$nombre} ({$sigla})",
                     $usuario->id_usuario
                 );
             }
 
             return redirect()->route('materias.vista')->with('success', 'Materia eliminada correctamente.');
         } catch (\Exception $e) {
-            return redirect()->route('materias.vista')->with('error', 'Error al eliminar la materia: ' . $e->getMessage());
+            return redirect()->route('materias.vista')->with('error', 'Error al eliminar: ' . $e->getMessage());
         }
     }
 }
