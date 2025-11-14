@@ -3,7 +3,7 @@ nixPkgs = ['php83', 'php83Packages.composer', 'php83Packages.gd', 'nginx', 'node
 
 [phases.build]
 cmds = [
-  'composer install --no-interaction --prefer-dist --optimize-autoloader --no-scripts --ignore-platform-req=php-64bit --ignore-platform-req=ext-gd'
+  'composer install --no-interaction --prefer-dist --optimize-autoloader --no-scripts --ignore-platform-req=php --ignore-platform-req=ext-gd --ignore-platform-reqs'
 ]
 
 [start]
