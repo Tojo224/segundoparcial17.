@@ -7,6 +7,8 @@ use App\Modules\AdministracionUsuariosSeguridad\Controllers\BitacoraController;
 use App\Modules\GestionAcademica\Controllers\DocentesController;
 use App\Modules\GestionAcademica\Controllers\MateriasController;
 use App\Modules\GestionAcademica\Controllers\GruposController;
+use App\Modules\ReportesYDashboard\Controllers\ReportesController;
+use App\Modules\ReportesYDashboard\Controllers\DashboardController;
 
 Route::get('/', function () { return redirect('/login'); });
 
@@ -51,6 +53,10 @@ Route::middleware('auth')->group(function () {
     Route::post('/grupos', [GruposController::class, 'storeWeb'])->name('grupos.store');
     Route::put('/grupos/{id}', [GruposController::class, 'updateWeb'])->name('grupos.update'); 
     Route::delete('/grupos/{id}', [GruposController::class, 'destroyWeb'])->name('grupos.destroy');
+
+    // Rutas de Reportes y Dashboard (CU17, CU18, CU19)
+    Route::get('/reportes', [ReportesController::class, 'vistaReportes'])->name('reportes.vista');
+    Route::get('/dashboardrep', [DashboardController::class, 'vistaDashboard'])->name('dashboardrep.vista');
 });
 
 // Cargar rutas API (roles, usuarios, bitácora)

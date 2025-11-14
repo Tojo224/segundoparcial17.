@@ -79,3 +79,34 @@ Route::prefix('carga-horaria')->group(function () {
     Route::put('/{id}', [CargaHorariaController::class, 'update']);
     Route::delete('/{id}', [CargaHorariaController::class, 'destroy']);
 });
+
+/*
+|--------------------------------------------------------------------------
+| RUTAS API — Reportes y Dashboard (CU17, CU18, CU19)
+|--------------------------------------------------------------------------
+*/
+use App\Modules\ReportesYDashboard\Controllers\{
+    ReportesController,
+    DashboardController
+};
+
+// Endpoints de Reportes
+Route::prefix('reportes')->group(function () {
+    Route::post('/horarios', [ReportesController::class, 'generarReporteHorarios']);
+    Route::post('/asistencia', [ReportesController::class, 'generarReporteAsistencia']);
+    Route::post('/aulas', [ReportesController::class, 'generarReporteDisponibilidadAulas']);
+    Route::post('/carga-horaria', [ReportesController::class, 'generarReporteCargaHorariaDocente']);
+    Route::post('/pdf', [ReportesController::class, 'exportarPDF']);
+    Route::post('/excel', [ReportesController::class, 'exportarExcel']);
+});
+
+// Endpoints de Dashboard
+Route::prefix('dashboard')->group(function () {
+    Route::get('/kpis', [DashboardController::class, 'obtenerKPIs']);
+    Route::get('/actividad', [DashboardController::class, 'obtenerActividadUltimos7Dias']); 
+    Route::get('/distribucion', [DashboardController::class, 'obtenerDistribucionReportes']);
+    Route::get('/estadisticas-carga-horaria', [DashboardController::class, 'estadisticasCargaHoraria']);
+    Route::get('/gestiones', [DashboardController::class, 'obtenerGestiones']);
+
+
+});

@@ -117,9 +117,22 @@
             <svg :class="{'rotate-180': open}" class="h-4 w-4 text-slate-300 transition" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m19 9-7 7-7-7"/></svg>
           </button>
           <ul x-show="open" x-collapse class="py-1">
-            <li><a href="#" data-role="CU16" class="flex items-center gap-2 px-4 py-2 rounded-md hover:bg-white/5"><svg class="h-5 w-5 opacity-80" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3v18h18"/></svg>Generar reportes académicos</a></li>
-            <li><a href="#" data-role="CU17" class="flex items-center gap-2 px-4 py-2 rounded-md hover:bg-white/5"><svg class="h-5 w-5 opacity-80" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v8m4-4H8"/></svg>Exportar reportes en Excel y PDF</a></li>
-            <li><a href="#" data-role="CU18" class="flex items-center gap-2 px-4 py-2 rounded-md hover:bg-white/5"><svg class="h-5 w-5 opacity-80" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 3v18M3 12h18"/></svg>Generar dashboard</a></li>
+            <li><a href="{{ route('reportes.vista') }}" data-role="CU17"
+              class="flex items-center gap-2 px-4 py-2 rounded-md hover:bg-white/5
+                     {{ request()->routeIs('reportes.vista') ? 'bg-white/5' : '' }}">
+              <svg class="h-5 w-5 opacity-80" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3v18h18"/>
+              </svg>
+              Generar reportes
+            </a></li>
+            <li><a href="{{ route('dashboardrep.vista') }}" data-role="CU19"
+              class="flex items-center gap-2 px-4 py-2 rounded-md hover:bg-white/5
+                     {{ request()->routeIs('dashboardrep.vista') ? 'bg-white/5' : '' }}">
+              <svg class="h-5 w-5 opacity-80" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 3v18M3 12h18"/>
+              </svg>
+              Dashboard de Reportes
+            </a></li>
           </ul>
         </div>
       </section>
@@ -308,34 +321,7 @@
 
     <!-- Contenido -->
     <main class="flex-1">
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-        <div class="rounded-2xl bg-white/5 ring-1 ring-white/10 p-6">
-          <h1 class="text-xl font-semibold">Bienvenido/a</h1>
-          <p class="mt-1 text-slate-300">
-            Usa el selector de rol en el panel lateral para simular los permisos. El menú mostrará únicamente
-            los casos de uso habilitados para el rol seleccionado.
-          </p>
-
-          <div class="mt-6 grid gap-4 sm:grid-cols-2">
-            <div class="rounded-xl border border-white/10 p-4">
-              <div class="font-medium mb-1">Módulos</div>
-              <ul class="list-disc list-inside text-slate-300/90 text-sm">
-                <li>Administración de Usuarios y Seguridad</li>
-                <li>Gestión Académica</li>
-                <li>Aulas y Horarios</li>
-                <li>Control de Asistencia</li>
-                <li>Reportes y Dashboard</li>
-              </ul>
-            </div>
-            <div class="rounded-xl border border-white/10 p-4">
-              <div class="font-medium mb-1">Nota</div>
-              <p class="text-slate-300/90 text-sm">
-                Esta UI es una base. Enlaza cada caso de uso a tus rutas reales editando los <code>href</code> del sidebar.
-              </p>
-            </div>
-          </div>
-        </div>
-      </div>
+      @yield('content')
     </main>
 
     <footer class="py-4 text-center text-xs text-slate-400">FICCT — Sistema de Gestión Académica</footer>
@@ -345,10 +331,10 @@
 <!-- Lógica de permisos por rol -->
 <script>
   const permisos = {
-    Administrador: ['CU1','CU2','CU3','CU4','CU5','CU6','CU7','CU8','CU9','CU12_Aulas','CU13'],
-    Coordinador:   ['CU1','CU2','CU3','CU6','CU7','CU8','CU9','CU10','CU11','CU12_Horarios','CU13','CU15','CU16','CU17','CU18'],
+    Administrador: ['CU1','CU2','CU3','CU4','CU5','CU6','CU7','CU8','CU9','CU12_Aulas','CU13','CU15','CU16','CU17','CU18','CU19'],
+    Coordinador:   ['CU1','CU2','CU3','CU6','CU7','CU8','CU9','CU10','CU11','CU12_Horarios','CU13','CU15','CU16','CU17','CU18','CU19'],
     Docente:       ['CU1','CU2','CU3','CU14'],
-    Autoridad:     ['CU1','CU2','CU3','CU15','CU16','CU17','CU18'],
+    Autoridad:     ['CU1','CU2','CU3','CU15','CU16','CU17','CU18','CU19'],
     Auxiliar:      ['CU1','CU2','CU3','CU12_Aulas','CU13']
   };
 
